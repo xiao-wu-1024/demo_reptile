@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wujia.demo_reptile.mapper.TestReptileLabelMapper">
+    <resultMap id="BaseResultMap" type="com.wujia.demo_reptile.entity.TestReptileLabel">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="htmlLabel" column="html_label" jdbcType="VARCHAR"/>
+        <result property="htmlLabelAttributes" column="html_label_attributes" jdbcType="VARCHAR"/>
+    </resultMap>
+
+</mapper>
+
