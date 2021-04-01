@@ -1,6 +1,7 @@
 package com.wujia.demo_reptile.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wujia.demo_reptile.dto.ResourceLibraryDTO;
 import com.wujia.demo_reptile.dto.SourceDTO;
@@ -39,9 +40,7 @@ public class ReptileController {
     public Page<ResourceLibraryDTO> listResource(@RequestParam(defaultValue = "1") Integer pageNo,
                                                  @RequestParam(defaultValue = "10") Integer pageSize){
         Page<TestSource> entityPage = new Page<>(pageNo, pageSize);
-        List<TestSource> list = testSourceService.lambdaQuery()
-                .list();
-        entityPage.setRecords(list);
+        entityPage = testSourceService.page(entityPage);
         Page<ResourceLibraryDTO> dtoPage = new Page<>();
         BeanUtils.copyProperties(entityPage, dtoPage);
         return dtoPage;
@@ -71,10 +70,8 @@ public class ReptileController {
                                       @RequestParam(defaultValue = "10") Integer pageSize,
                                       String type){
         Page<TestReptile> page = new Page<>(pageNo, pageSize);
-        List<TestReptile> list = reptileService.lambdaQuery()
-                .eq(StrUtil.isNotBlank(type), TestReptile::getType, type)
-                .list();
-        page.setRecords(list);
+        page = reptileService.page(page, new LambdaQueryWrapper<TestReptile>()
+                        .eq(StrUtil.isNotBlank(type), TestReptile::getType, type));
         Page<SourceDTO> dtoPage = new Page<>();
         BeanUtils.copyProperties(page, dtoPage);
         return dtoPage;
