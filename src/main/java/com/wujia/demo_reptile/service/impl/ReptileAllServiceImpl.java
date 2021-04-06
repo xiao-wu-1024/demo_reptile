@@ -59,7 +59,7 @@ public class ReptileAllServiceImpl extends ServiceImpl<ReptileMapper, TestReptil
             if (recordingMap.get(entry.getKey()) == null) {
                 // 获取子连接下的所有链接
                 childMap = getAllUrl(entry.getKey(), null);
-                recordingMap.put(entry.getKey(),"ok");
+                recordingMap.put(entry.getKey(),entry.getValue());
                 if (childMap == null) {
                     continue;
                 }
@@ -92,7 +92,6 @@ public class ReptileAllServiceImpl extends ServiceImpl<ReptileMapper, TestReptil
         String domain = MyHttpUtils.getTopDomain(url, 2, "");
         // 去除非当前域名下的 href
         HelpUtils.byKeyRemoveRepeat(urlMap, domain);
-//        urlMap.putAll(map);
         return urlMap;
     }
 

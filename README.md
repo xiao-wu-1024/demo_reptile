@@ -1,4 +1,5 @@
 # java爬虫(demo)
+> 特别备注,本demo仅供学习参考
 ## 描述
 * 框架 SpringBoot + MyBatis-Plus
 * 数据库 Mysql
@@ -17,6 +18,7 @@ CREATE TABLE `test_reptile` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8 COMMENT='爬虫链接库';
 
+## 这个是预留表
 CREATE TABLE `test_reptile_label` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `html_label` varchar(60) NOT NULL COMMENT '标签名',
@@ -30,5 +32,5 @@ CREATE TABLE `test_source` (
   `source_url` varchar(255) DEFAULT NULL COMMENT '资源库域名',
   `source_top` varchar(255) DEFAULT NULL COMMENT '资源库前缀(多个)',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='特殊资源网站';
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='资源网站';
 ```
