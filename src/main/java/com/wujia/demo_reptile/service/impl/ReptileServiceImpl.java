@@ -7,9 +7,9 @@ import com.wujia.demo_reptile.constant.ReptileEnum;
 import com.wujia.demo_reptile.entity.TestReptile;
 import com.wujia.demo_reptile.entity.TestSource;
 import com.wujia.demo_reptile.mapper.ReptileMapper;
-import com.wujia.demo_reptile.mapper.TestReptileLabelMapper;
 import com.wujia.demo_reptile.mapper.TestSourceMapper;
 import com.wujia.demo_reptile.service.ReptileService;
+import com.wujia.demo_reptile.util.MyHttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,36 +32,41 @@ import java.util.Map;
 public class ReptileServiceImpl extends ServiceImpl<ReptileMapper, TestReptile> implements ReptileService {
 
     @Resource
-    private TestReptileLabelMapper reptileLabelMapper;
-    @Resource
     private TestSourceMapper sourceMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String getMessage(String url, Integer type) {
-        Document doc;
-        try {
-            doc = Jsoup.connect(url).get();
-        } catch (IOException e) {
-            log.error("出现异常:{}", e.getMessage());
-            throw new RuntimeException();
-        }
-        ReptileEnum anEnum = selectLabel(type);
-        if (anEnum == null) {
-            return "选择类型不存在";
-        }
-        Map<String, String> map;
+        Document doc = getDoc(url);
+
         TestSource entity = isSpecial(doc.title(), url);
-        if (entity.getSourceTop() != null) {
-            map = listUrl(doc, entity.getSourceTop(), anEnum);
-        }else {
-            map = listUrl(doc, "", anEnum);
-        }
+        Map<String, String> map = getMessageMap(doc, type);
         if (map != null) {
             save(map, type, entity.getId());
             return "本次爬取数据 : " + map.size();
         }
         return "本次爬取数据 : 0";
+    }
+
+    @Override
+    public Map<String, String> getMessageMap(Document doc, Integer type) {
+        ReptileEnum anEnum = selectLabel(type);
+        if (anEnum == null) {
+            throw new RuntimeException("选择类型不存在异常");
+        }
+        return listUrl(doc, anEnum);
+    }
+
+    @Override
+    public Document getDoc(String url){
+        Document doc;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            log.error("出现异常:{}", e.getMessage());
+            return null;
+        }
+        return doc;
     }
 
     /**
@@ -89,11 +94,10 @@ public class ReptileServiceImpl extends ServiceImpl<ReptileMapper, TestReptile> 
     /**
      * 获取链接
      * @param doc 网页模板
-     * @param top 请求头部
-     * @return ret
      * @param anEnum 枚举
+     * @return ret
      */
-    private Map<String,String> listUrl(Document doc, String top, ReptileEnum anEnum){
+    private Map<String,String> listUrl(Document doc, ReptileEnum anEnum){
         log.info("-----开始获取url-----");
         // Map<链接地址, 链接名称>
         Map<String,String> map = new HashMap<>(16);
@@ -108,32 +112,15 @@ public class ReptileServiceImpl extends ServiceImpl<ReptileMapper, TestReptile> 
             return null;
         }
         for (Element link : links){
-            System.out.println("名称 : " + link.text());
-            System.out.println("链接 : " + top + link.attr(anEnum.getMessage()));
+//            System.out.println("名称 : " + link.text());
+//            System.out.println("链接 : " + link.attr(anEnum.getMessage()));
             map.put(link.absUrl(anEnum.getMessage()), link.text());
         }
         log.info("-----结束获取url-----");
         return map;
     }
 
-    /**
-     * 获取当前链接域名信息
-     * @param url url
-     * @return ret
-     */
-    private String getDomain(String url){
-        int x = StrUtil.indexOf(url,'/');
-        if (x < 0) {
-            // todo 2021/4/1 暂时没想好怎么写 不是域名的url
-            return url;
-        }
-        x = StrUtil.indexOf(url,'/',x + 2);
-        if (x < 0) {
-            return url;
-        }
-        url = StrUtil.sub(url, 0, x);
-        return url;
-    }
+
 
     /**
      * 判断是否存在资源库
@@ -141,7 +128,7 @@ public class ReptileServiceImpl extends ServiceImpl<ReptileMapper, TestReptile> 
      * @return ret
      */
     private TestSource isSpecial(String name, String url){
-        url = getDomain(url);
+        url = MyHttpUtils.getDomain(url);
         TestSource entity = sourceMapper.getByUrl(url);
         if (entity == null) {
             entity = TestSource.builder()

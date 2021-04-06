@@ -9,8 +9,8 @@ public enum ReptileEnum {
     /**
      * href
      */
-    HREF(1,"href"),
-    SRC(2, "src")
+    HREF(1,"abs:href"),
+    SRC(2, "abs:src")
     ;
 
     private int code;

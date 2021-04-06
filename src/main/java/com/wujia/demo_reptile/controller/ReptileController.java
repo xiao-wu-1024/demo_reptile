@@ -8,6 +8,7 @@ import com.wujia.demo_reptile.dto.SourceDTO;
 import com.wujia.demo_reptile.entity.TestReptile;
 import com.wujia.demo_reptile.entity.TestSource;
 import com.wujia.demo_reptile.service.ITestSourceService;
+import com.wujia.demo_reptile.service.ReptileAllService;
 import com.wujia.demo_reptile.service.ReptileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author xiao-_-wu
@@ -29,6 +31,18 @@ public class ReptileController {
     private ReptileService reptileService;
     @Resource
     private ITestSourceService testSourceService;
+    @Resource
+    private ReptileAllService reptileAllService;
+
+    /**
+     * 获取当前域名下所有链接
+     * @return ret
+     */
+    @GetMapping("/get/all/message")
+    public Map<String, String> getAllMessage(String url){
+        log.info("当前域名是:{}", url);
+        return reptileAllService.getAllMessage(url);
+    }
 
     /**
      * 获取资源库
